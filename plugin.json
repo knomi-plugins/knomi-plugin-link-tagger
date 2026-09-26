@@ -1,7 +1,7 @@
 {
   "id": "link-tagger",
   "name": "关联建议官",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "整理阶段：规则匹配 + LLM 语义织网（自动维护知识地图，孤岛/薄弱方向优先），孤岛一键补链、死链体检与治理，让图谱长出边",
   "entry": "index.js",
   "permissions": [
@@ -35,6 +35,26 @@
       "type": "number",
       "default": 3,
       "description": "自动织网单次最多自动应用的链接数（硬预算，防成本失控）"
+    }
+  ],
+  "agentTools": [
+    {
+      "name": "suggest_relations"
+    },
+    {
+      "name": "auto_suggest_relations"
+    },
+    {
+      "name": "weave_graph"
+    },
+    {
+      "name": "apply_link"
+    },
+    {
+      "name": "apply_links_bulk"
+    },
+    {
+      "name": "lint_links"
     }
   ]
 }
