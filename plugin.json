@@ -1,14 +1,40 @@
 {
   "id": "link-tagger",
   "name": "关联建议官",
-  "version": "0.1.0",
-  "description": "整理阶段：扫描文档间互相提及但未链接的关系，给出 WikiLink 建议并一键应用，让图谱长出边",
+  "version": "0.5.2",
+  "description": "整理阶段：规则匹配 + LLM 语义织网（自动维护知识地图，孤岛/薄弱方向优先），孤岛一键补链、死链体检与治理，让图谱长出边",
   "entry": "index.js",
   "permissions": [
     "file:read",
     "file:write",
     "db:read",
     "db:write",
-    "agent:tools"
+    "agent:tools",
+    "ai:chat",
+    "notify"
+  ],
+  "usage": "让知识图谱\"长出边\"并自动保持互联：\n怎么用：\n1. 说「扫描可以互链的文档」——规则匹配（零成本）抓字面提及；\n2. 说「LLM 织网」/「智能关联文档」——auto_suggest_relations 语义发现（相关/前置/对比/引用），规则抓不到的它来抓；\n3. 说「一键织网」——weave_graph 合并两类建议自动应用 top N（可指定聚焦文档，孤岛补链优先）；\n4. 说「体检死链」——lint_links 零成本找出指向不存在文档的 [[死链]]；传 fix:true 自动清理「相关」小节内插件写入的死链行（正文手写链接只报告不自动改）；图谱页「死链体检」按钮直达同样能力；\n5. 图谱页有孤岛文档时，用「孤岛清单 → 一键补链」直达 weaveOrphans；\n6. 自动维护：守护每 1h 检查一次文档增长，达阈值（默认 3 篇）且距上次 ≥20h 才消耗 LLM 自动织网（孤岛/薄弱方向优先）并系统通知；首次仅记基线。\n治理：写入全部为「相关」小节追加式，不改正文；可在插件配置调整阈值或关闭自动织网。\n典型节奏：批量导入新资料后说一声「一键织网」，日常交给守护，发现孤岛到图谱页一键补链。",
+  "configSchema": [
+    {
+      "key": "auto_weave_enabled",
+      "label": "自动织网",
+      "type": "boolean",
+      "default": true,
+      "description": "守护每 1h 检查一次文档增长，达阈值自动织网并系统通知（孤岛/薄弱方向优先；每次最多自动应用 weave_apply_count 条；使用 LLM 会产生少量费用，可关闭改为手动触发）"
+    },
+    {
+      "key": "weave_min_new_docs",
+      "label": "织网触发阈值（新增文档数）",
+      "type": "number",
+      "default": 3,
+      "description": "距上次织网新增多少篇文档后触发一次自动织网"
+    },
+    {
+      "key": "weave_apply_count",
+      "label": "自动应用条数",
+      "type": "number",
+      "default": 3,
+      "description": "自动织网单次最多自动应用的链接数（硬预算，防成本失控）"
+    }
   ]
 }
